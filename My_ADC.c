@@ -62,25 +62,19 @@ void select_clk_source(uint32_t clkSource){
 }
 
 void setup_ADC14(void){
-    // Configure ADC14
-    // Turn on ADC14, set sampling time
-    ADC14->CTL0 |= ADC14_CTL0_ON; //ADC 14 ON
-    ADC14->CTL0 |= ADC14_CTL0_SHP; //Sample and hold pulse select mode
-    select_sample_time_cycles(NUM_CYCLES_4); //sample time # of cycles
+    ADC14->CTL0 |= ADC14_CTL0_ON;               //ADC 14 ON
+    ADC14->CTL0 |= ADC14_CTL0_SHP;              //Sample and hold pulse select mode
+    select_sample_time_cycles(NUM_CYCLES_128);  //sample time # of cycles
     select_clk_source(MY_MCLK);
-    //ADC14->CTL0 |= ADC14_CTL0_SSEL_3; //source is set to MCLK
-    ADC14->CTL0 |= ADC14_CTL1_RES__14BIT; //Use sampling timer, 14-bit conversion results
-    // Vr+ = VeREF+ (ext) and Vr-=VeREF-, A0
-    ADC14->MCTL[0] = ADC14_MCTLN_VRSEL_14 | ADC14_MCTLN_INCH_0;
-    // Enable ADC conv complete interrupt
-    ADC14->IER0 |= ADC14_IER0_IE0;
-    // Enable conversions
-    ADC14->CTL0 |= ADC14_CTL0_ENC;
+    ADC14->CTL0 |= ADC14_CTL1_RES__14BIT;       //Use sampling timer, 14-bit conversion results
+    ADC14->MCTL[0] = ADC14_MCTLN_INCH_6;        //Use Channel 6 Avcc is by default 3.3v
+    ADC14->IER0 |= ADC14_IER0_IE0;              // Enable ADC conv complete interrupt
+    ADC14->CTL0 |= ADC14_CTL0_ENC;              // Enable conversions
 }
 
 void ADC14_IRQHandler(void){
-    static uint16_t digitalVal;
-    digitalVal = ADC14->MEM[0];             // Read conversion result
+    static uint16_t digitalVal = 0;
+    digitalVal = ADC14->MEM[0];                 // Read conversion result
     flag = 1;
 }
 
